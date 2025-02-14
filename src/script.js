@@ -1,149 +1,114 @@
-let startButton = document.getElementById("startButton");
-let newGameButton = document.getElementById("newGameButton");
-let startNewGameButton = document.getElementById("startNewGameButton");
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scale = 20; // Grootte van elk blok
+const rows = canvas.height / scale;
+const columns = canvas.width / scale;
 
-let game = document.getElementById("game");
-let timerDisplay = document.getElementById("timeDisplay");
-let blocksContainer = document.getElementById("blocks");
-let scoreDisplay = document.getElementById("score");
-let highscoreDisplay = document.getElementById("highscore");
+let snake;
+let apple;
+let score;
+let highScore = 0;
+let gameOver = false;
 
-let finalScoreDisplay = document.getElementById("finalScore");
-let finalHighscoreDisplay = document.getElementById("finalHighscore");
-let emojiRating = document.getElementById("emojiRating");
-let userRating = document.getElementById("userRating");
-
-let timer;
-let score = 0;
-let highscore = localStorage.getItem("highscore") || 0;
-let timeLeft = 60; // Fixed time of 60 seconds
-let blockColors = ['#FF5733', '#33FF57', '#3357FF', '#57FF33', '#FF5733', '#33FF57', '#3357FF', '#57FF33', 
-                  '#FF5733', '#33FF57', '#3357FF', '#57FF33', '#FF5733', '#33FF57', '#3357FF', '#57FF33'];
-let blocksMatched = 0; // Tracks how many blocks have been matched (8 pairs of blocks)
-let selectedBlocks = []; // Tracks the selected blocks for matching
-
-highscoreDisplay.textContent = `Highscore: ${highscore}`;
-
-startButton.addEventListener("click", function() {
-    document.getElementById("startScreen").style.display = "none";
-    game.style.display = "flex";
-    startGame();
-});
-
-newGameButton.addEventListener("click", function() {
-    score = 0;
-    scoreDisplay.textContent = "Score: " + score;
-    blocksMatched = 0;
-    blocksContainer.innerHTML = '';
-    startGame();
-});
-
-startNewGameButton.addEventListener("click", function() {
-    document.getElementById("endScreen").style.display = "none";
-    document.getElementById("startScreen").style.display = "block";
-});
-
+// Start het spel
 function startGame() {
-    timeLeft = 60; // Reset to 60 seconds
+    snake = new Snake();
+    apple = new Apple();
     score = 0;
-    scoreDisplay.textContent = "Score: " + score;
-    blocksMatched = 0;
-    blocksContainer.innerHTML = '';
-    
-    timer = setInterval(updateTimer, 1000);
-    createBlocks();
+    gameOver = false;
+    window.setInterval(update, 100); // Update elke 100ms (snelheid)
 }
 
-function updateTimer() {
-    if (timeLeft > 0) {
-        timeLeft--;
-        timerDisplay.textContent = "🕒 " + timeLeft + " seconds";
-    } else {
-        endGame();
+// Update de status van de game
+function update() {
+    if (gameOver) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+
+    snake.move();
+    snake.draw();
+
+    apple.draw();
+    if (snake.eatApple(apple)) {
+        score++;
+        if (score > highScore) highScore = score;
+        apple = new Apple(); // Maak nieuwe appel
+    }
+
+    document.getElementById('score').textContent = `Score: ${score}`;
+    document.getElementById('highScore').textContent = `Highscore: ${highScore}`;
+
+    if (snake.isDead()) {
+        gameOver = true;
+        alert(`Game Over! Je score was ${score}`);
     }
 }
 
-function createBlocks() {
-    let blocks = [];
-    blockColors = shuffleArray(blockColors);
+// Snake object
+function Snake() {
+    this.body = [{ x: 10, y: 10 }];
+    this.direction = 'RIGHT'; // Start richting
+    this.changeDirection = function (newDirection) {
+        if (newDirection === 'UP' && this.direction !== 'DOWN') this.direction = 'UP';
+        if (newDirection === 'DOWN' && this.direction !== 'UP') this.direction = 'DOWN';
+        if (newDirection === 'LEFT' && this.direction !== 'RIGHT') this.direction = 'LEFT';
+        if (newDirection === 'RIGHT' && this.direction !== 'LEFT') this.direction = 'RIGHT';
+    };
 
-    for (let i = 0; i < 16; i++) { // 4x4 grid = 16 blocks
-        let block = document.createElement("div");
-        block.classList.add("block");
-        block.style.backgroundColor = "#DDDDDD"; // Default color
-        block.setAttribute("data-matched", "false");
-        block.setAttribute("data-color", blockColors[i]);
-        block.addEventListener("click", function() {
-            matchBlock(block);
+    this.move = function () {
+        let head = { ...this.body[0] };
+        if (this.direction === 'UP') head.y--;
+        if (this.direction === 'DOWN') head.y++;
+        if (this.direction === 'LEFT') head.x--;
+        if (this.direction === 'RIGHT') head.x++;
+
+        this.body.unshift(head);
+        this.body.pop();
+    };
+
+    this.draw = function () {
+        ctx.fillStyle = "green";
+        this.body.forEach(segment => {
+            ctx.fillRect(segment.x * scale, segment.y * scale, scale, scale);
         });
-        blocks.push(block);
-    }
-    blocks.forEach(block => blocksContainer.appendChild(block));
-}
+    };
 
-function matchBlock(block) {
-    if (block.getAttribute("data-matched") === "true") return;
-
-    block.style.backgroundColor = block.getAttribute("data-color");
-    block.setAttribute("data-matched", "true");
-    selectedBlocks.push(block);
-
-    if (selectedBlocks.length === 2) {
-        if (selectedBlocks[0].getAttribute("data-color") === selectedBlocks[1].getAttribute("data-color")) {
-            score++;
-            scoreDisplay.textContent = "Score: " + score;
-            blocksMatched++;
-
-            // Hide matched blocks after delay
-            setTimeout(function() {
-                selectedBlocks[0].style.opacity = "0";
-                selectedBlocks[1].style.opacity = "0";
-                selectedBlocks[0].setAttribute("data-matched", "true");
-                selectedBlocks[1].setAttribute("data-matched", "true");
-            }, 500);
-
-            if (blocksMatched === 8) {  // 8 pairs = 16 blocks
-                blocksMatched = 0;
-                blocksContainer.innerHTML = '';
-                createBlocks(); // Create new blocks after completing the round
-            }
-        } else {
-            // Reset colors after a brief moment, don't remove the blocks immediately
-            setTimeout(function() {
-                selectedBlocks[0].style.backgroundColor = "#DDDDDD";
-                selectedBlocks[1].style.backgroundColor = "#DDDDDD";
-                selectedBlocks[0].setAttribute("data-matched", "false");
-                selectedBlocks[1].setAttribute("data-matched", "false");
-            }, 500);
+    this.eatApple = function (apple) {
+        const head = this.body[0];
+        if (head.x === apple.x && head.y === apple.y) {
+            this.body.push({ x: apple.x, y: apple.y });
+            return true;
         }
-        selectedBlocks = [];
-    }
-}
+        return false;
+    };
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
-    }
-    return array;
-}
-
-function endGame() {
-    clearInterval(timer);
-    finalScoreDisplay.textContent = `Your Score: ${score}`;
-    finalHighscoreDisplay.textContent = `Highscore: ${highscore}`;
-
-    if (score > highscore) {
-        highscore = score;
-        localStorage.setItem("highscore", highscore);
-    }
-    highscoreDisplay.textContent = `Highscore: ${highscore}`;
-
-    document.getElementById("endScreen").style.display = "block";
-
-    emojiRating.addEventListener("click", function(event) {
-        if (event.target.classList.contains("emoji")) {
-            userRating.textContent = `You rated the game as: ${event.target.textContent}`;
+    this.isDead = function () {
+        const head = this.body[0];
+        if (head.x < 0 || head.x >= columns || head.y < 0 || head.y >= rows) return true;
+        for (let i = 1; i < this.body.length; i++) {
+            if (head.x === this.body[i].x && head.y === this.body[i].y) return true;
         }
-    });
+        return false;
+    };
 }
+
+// Apple object
+function Apple() {
+    this.x = Math.floor(Math.random() * columns);
+    this.y = Math.floor(Math.random() * rows);
+
+    this.draw = function () {
+        ctx.fillStyle = "red";
+        ctx.fillRect(this.x * scale, this.y * scale, scale, scale);
+    };
+}
+
+// Voeg toetsenbord input toe om de richting van de slang te veranderen
+window.addEventListener('keydown', (e) => {
+    if (e.key === "ArrowUp") snake.changeDirection('UP');
+    if (e.key === "ArrowDown") snake.changeDirection('DOWN');
+    if (e.key === "ArrowLeft") snake.changeDirection('LEFT');
+    if (e.key === "ArrowRight") snake.changeDirection('RIGHT');
+});
+
+startGame();

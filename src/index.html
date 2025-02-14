@@ -1,44 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Block Match</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Snake Game</title>
+    <link rel="stylesheet" href="style.css"> <!-- Laad de CSS -->
 </head>
 <body>
-    <div id="startScreen">
-        <h1>Welcome to Block Match</h1>
-        <button id="startButton" class="luxuryButton">Start Game</button>
-    </div>
 
-    <div id="game" style="display: none;">
-        <h1>Match the blocks!</h1>
-        <div id="gameInfo">
-            <span id="timer">🕒 <span id="timeDisplay">60</span> seconds</span>
-            <span id="score">Score: 0</span>
-        </div>
-        <div id="blocks"></div>
-        <button id="newGameButton" class="luxuryButton" style="display: none;">Start New Game</button>
-        <div id="highscore">Highscore: 0</div>
-    </div>
+<div class="container">
+    <h1>Snake Game</h1>
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+    <p id="score">Score: 0</p>
+    <p id="highScore">Highscore: 0</p>
+</div>
 
-    <div id="endScreen" style="display: none;">
-        <h1>Game Over</h1>
-        <div id="finalScore">Your Score: 0</div>
-        <div id="finalHighscore">Highscore: 0</div>
-        <h3>How did you like the game?</h3>
-        <div id="emojiRating">
-            <span class="emoji" data-rating="😊">😊</span>
-            <span class="emoji" data-rating="😐">😐</span>
-            <span class="emoji" data-rating="😢">😢</span>
-            <span class="emoji" data-rating="😃">😃</span>
-            <span class="emoji" data-rating="😍">😍</span>
-        </div>
-        <div id="userRating"></div>
-        <button id="startNewGameButton" class="luxuryButton">Start New Game</button>
-    </div>
-
-    <script src="script.js"></script>
+<script src="script.js"></script> <!-- Laad de JavaScript -->
 </body>
 </html>
