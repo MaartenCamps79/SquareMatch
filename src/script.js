@@ -1,140 +1,149 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const welcomeScreen = document.getElementById("welcome-screen");
-    const timeSelectScreen = document.getElementById("time-select-screen");
-    const gameScreen = document.getElementById("game-screen");
-    const endScreen = document.getElementById("end-screen");
+let startButton = document.getElementById("startButton");
+let newGameButton = document.getElementById("newGameButton");
+let startNewGameButton = document.getElementById("startNewGameButton");
 
-    const playButton = document.getElementById("play-button");
-    const startButtons = document.querySelectorAll(".start-game");
-    const restartBtn = document.getElementById("restart");
+let game = document.getElementById("game");
+let timerDisplay = document.getElementById("timeDisplay");
+let blocksContainer = document.getElementById("blocks");
+let scoreDisplay = document.getElementById("score");
+let highscoreDisplay = document.getElementById("highscore");
 
-    const timerDisplay = document.getElementById("timer");
-    const grid = document.getElementById("grid");
-    const scoreDisplay = document.getElementById("score");
-    const finalScore = document.getElementById("final-score");
+let finalScoreDisplay = document.getElementById("finalScore");
+let finalHighscoreDisplay = document.getElementById("finalHighscore");
+let emojiRating = document.getElementById("emojiRating");
+let userRating = document.getElementById("userRating");
 
-    const emojiContainer = document.getElementById("emoji-rating");
-    
-    let score = 0;
-    let highScore = localStorage.getItem("highScore") || 0;
-    let timer;
-    let gameTime;
-    let selectedBlock = null;
+let timer;
+let score = 0;
+let highscore = localStorage.getItem("highscore") || 0;
+let timeLeft = 60; // Fixed time of 60 seconds
+let blockColors = ['#FF5733', '#33FF57', '#3357FF', '#57FF33', '#FF5733', '#33FF57', '#3357FF', '#57FF33', 
+                  '#FF5733', '#33FF57', '#3357FF', '#57FF33', '#FF5733', '#33FF57', '#3357FF', '#57FF33'];
+let blocksMatched = 0; // Tracks how many blocks have been matched (8 pairs of blocks)
+let selectedBlocks = []; // Tracks the selected blocks for matching
 
-    playButton.addEventListener("click", () => {
-        welcomeScreen.classList.add("hidden");
-        timeSelectScreen.classList.remove("hidden");
-    });
+highscoreDisplay.textContent = `Highscore: ${highscore}`;
 
-    startButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            startGame(parseInt(button.dataset.time));
-        });
-    });
-
-    function startGame(time) {
-        timeSelectScreen.classList.add("hidden");
-        gameScreen.classList.remove("hidden");
-
-        score = 0;
-        scoreDisplay.textContent = `Score: ${score}`;
-        gameTime = time;
-        timerDisplay.textContent = `⏳ ${gameTime}`;
-        generateGrid();
-
-        timer = setInterval(() => {
-            gameTime--;
-            timerDisplay.textContent = `⏳ ${gameTime}`;
-            if (gameTime <= 0) endGame();
-        }, 1000);
-    }
-
-    function generateGrid() {
-        grid.innerHTML = "";
-        let colors = ["red", "blue", "green", "yellow", "purple", "orange"];
-        let blocks = [];
-
-        for (let i = 0; i < 8; i++) {
-            let color = colors[Math.floor(Math.random() * colors.length)];
-            blocks.push(color, color);
-        }
-
-        blocks.sort(() => Math.random() - 0.5);
-
-        blocks.forEach(color => {
-            let block = document.createElement("div");
-            block.classList.add("block");
-            block.style.backgroundColor = color;
-            block.dataset.color = color;
-            block.addEventListener("click", () => selectBlock(block));
-            grid.appendChild(block);
-        });
-    }
-
-    function selectBlock(block) {
-        if (!selectedBlock) {
-            selectedBlock = block;
-            block.style.opacity = "0.5";
-        } else if (selectedBlock !== block) {
-            if (selectedBlock.dataset.color === block.dataset.color) {
-                selectedBlock.remove();
-                block.remove();
-                score++;
-                scoreDisplay.textContent = `Score: ${score}`;
-                if (grid.childElementCount === 0) generateGrid();
-            } else {
-                selectedBlock.style.opacity = "1";
-            }
-            selectedBlock = null;
-        }
-    }
-
-    function endGame() {
-        clearInterval(timer);
-        gameScreen.classList.add("hidden");
-        endScreen.classList.remove("hidden");
-        finalScore.textContent = score;
-
-        if (score > highScore) {
-            highScore = score;
-            localStorage.setItem("highScore", highScore);
-        }
-
-        document.getElementById("high-score").textContent = `🏆 High Score: ${highScore}`;
-    }
-
-    restartBtn.addEventListener("click", () => {
-        endScreen.classList.add("hidden");
-        gameScreen.classList.remove("hidden");
-        startGame(gameTime);
-    });
-
-    // Voeg een plek toe in de HTML voor de highscore
-    const highScoreText = document.createElement("p");
-    highScoreText.id = "high-score";
-    highScoreText.textContent = `🏆 High Score: ${highScore}`;
-    endScreen.insertBefore(highScoreText, finalScore.nextSibling);
-
-    // ✨ Emoji beoordeling en animatie
-    emojiContainer.addEventListener("click", (event) => {
-        if (event.target.tagName === "SPAN") {
-            let selectedEmoji = event.target.textContent;
-            animateEmojis(selectedEmoji);
-        }
-    });
-
-    function animateEmojis(emoji) {
-        for (let i = 0; i < 20; i++) {
-            let emojiElement = document.createElement("span");
-            emojiElement.textContent = emoji;
-            emojiElement.classList.add("flying-emoji");
-            emojiElement.style.left = `${Math.random() * 100}%`;
-            emojiElement.style.animationDuration = `${1 + Math.random()}s`;
-            document.body.appendChild(emojiElement);
-
-            setTimeout(() => {
-                emojiElement.remove();
-            }, 2000);
-        }
-    }
+startButton.addEventListener("click", function() {
+    document.getElementById("startScreen").style.display = "none";
+    game.style.display = "flex";
+    startGame();
 });
+
+newGameButton.addEventListener("click", function() {
+    score = 0;
+    scoreDisplay.textContent = "Score: " + score;
+    blocksMatched = 0;
+    blocksContainer.innerHTML = '';
+    startGame();
+});
+
+startNewGameButton.addEventListener("click", function() {
+    document.getElementById("endScreen").style.display = "none";
+    document.getElementById("startScreen").style.display = "block";
+});
+
+function startGame() {
+    timeLeft = 60; // Reset to 60 seconds
+    score = 0;
+    scoreDisplay.textContent = "Score: " + score;
+    blocksMatched = 0;
+    blocksContainer.innerHTML = '';
+    
+    timer = setInterval(updateTimer, 1000);
+    createBlocks();
+}
+
+function updateTimer() {
+    if (timeLeft > 0) {
+        timeLeft--;
+        timerDisplay.textContent = "🕒 " + timeLeft + " seconds";
+    } else {
+        endGame();
+    }
+}
+
+function createBlocks() {
+    let blocks = [];
+    blockColors = shuffleArray(blockColors);
+
+    for (let i = 0; i < 16; i++) { // 4x4 grid = 16 blocks
+        let block = document.createElement("div");
+        block.classList.add("block");
+        block.style.backgroundColor = "#DDDDDD"; // Default color
+        block.setAttribute("data-matched", "false");
+        block.setAttribute("data-color", blockColors[i]);
+        block.addEventListener("click", function() {
+            matchBlock(block);
+        });
+        blocks.push(block);
+    }
+    blocks.forEach(block => blocksContainer.appendChild(block));
+}
+
+function matchBlock(block) {
+    if (block.getAttribute("data-matched") === "true") return;
+
+    block.style.backgroundColor = block.getAttribute("data-color");
+    block.setAttribute("data-matched", "true");
+    selectedBlocks.push(block);
+
+    if (selectedBlocks.length === 2) {
+        if (selectedBlocks[0].getAttribute("data-color") === selectedBlocks[1].getAttribute("data-color")) {
+            score++;
+            scoreDisplay.textContent = "Score: " + score;
+            blocksMatched++;
+
+            // Hide matched blocks after delay
+            setTimeout(function() {
+                selectedBlocks[0].style.opacity = "0";
+                selectedBlocks[1].style.opacity = "0";
+                selectedBlocks[0].setAttribute("data-matched", "true");
+                selectedBlocks[1].setAttribute("data-matched", "true");
+            }, 500);
+
+            if (blocksMatched === 8) {  // 8 pairs = 16 blocks
+                blocksMatched = 0;
+                blocksContainer.innerHTML = '';
+                createBlocks(); // Create new blocks after completing the round
+            }
+        } else {
+            // Reset colors after a brief moment, don't remove the blocks immediately
+            setTimeout(function() {
+                selectedBlocks[0].style.backgroundColor = "#DDDDDD";
+                selectedBlocks[1].style.backgroundColor = "#DDDDDD";
+                selectedBlocks[0].setAttribute("data-matched", "false");
+                selectedBlocks[1].setAttribute("data-matched", "false");
+            }, 500);
+        }
+        selectedBlocks = [];
+    }
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+    }
+    return array;
+}
+
+function endGame() {
+    clearInterval(timer);
+    finalScoreDisplay.textContent = `Your Score: ${score}`;
+    finalHighscoreDisplay.textContent = `Highscore: ${highscore}`;
+
+    if (score > highscore) {
+        highscore = score;
+        localStorage.setItem("highscore", highscore);
+    }
+    highscoreDisplay.textContent = `Highscore: ${highscore}`;
+
+    document.getElementById("endScreen").style.display = "block";
+
+    emojiRating.addEventListener("click", function(event) {
+        if (event.target.classList.contains("emoji")) {
+            userRating.textContent = `You rated the game as: ${event.target.textContent}`;
+        }
+    });
+}
