@@ -1,17 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <title>Vanilla JavaScript App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Match</title>
 </head>
-
 <body>
-  <main>
-    <h1>Vanilla JavaScript App</h1>
-  </main>
-</body>
+    <!-- Startscherm -->
+    <div id="welcome-screen">
+        <h1>Welcome to Block Match</h1>
+        <button id="play-button">Play</button>
+    </div>
 
+    <!-- Tijd kiezen -->
+    <div id="time-select-screen" class="hidden">
+        <h2>Choose game time</h2>
+        <button class="start-game" data-time="60">⏳ 1 Minute</button>
+        <button class="start-game" data-time="120">⏳ 2 Minutes</button>
+        <button class="start-game" data-time="300">⏳ 5 Minutes</button>
+    </div>
+
+    <!-- Spelscherm -->
+    <div id="game-screen" class="hidden">
+        <h2>Match the Colors!</h2>
+        <p id="timer">⏳ 60</p>
+        <div id="grid"></div>
+        <p>Score: <span id="score">0</span></p>
+    </div>
+
+    <!-- Eindscherm -->
+    <div id="end-screen" class="hidden">
+        <h2>Game Over!</h2>
+        <p>Your score: <span id="final-score"></span></p>
+        <p>How was this game?</p>
+        <div id="emoji-rating">
+            😊 😐 😒 😢 😡
+        </div>
+        <button id="restart">Start New Game</button>
+    </div>
+</body>
 </html>
