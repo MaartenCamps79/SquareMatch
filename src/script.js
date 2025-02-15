@@ -1,114 +1,73 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const scale = 20; // Grootte van elk blok
-const rows = canvas.height / scale;
-const columns = canvas.width / scale;
+document.addEventListener("DOMContentLoaded", () => {
+    // Haal de schermen op
+    const welcomeScreen = document.getElementById("welcome-screen");
+    const timeSelectScreen = document.getElementById("time-select-screen");
+    const gameScreen = document.getElementById("game-screen");
+    const endScreen = document.getElementById("end-screen");
 
-let snake;
-let apple;
-let score;
-let highScore = 0;
-let gameOver = false;
+    // Haal de knoppen op
+    const playButton = document.getElementById("play-button");
+    const startButtons = document.querySelectorAll(".start-game");
+    const restartBtn = document.getElementById("restart");
 
-// Start het spel
-function startGame() {
-    snake = new Snake();
-    apple = new Apple();
-    score = 0;
-    gameOver = false;
-    window.setInterval(update, 100); // Update elke 100ms (snelheid)
-}
+    const timerDisplay = document.getElementById("timer");
+    const scoreDisplay = document.getElementById("score");
+    const finalScore = document.getElementById("final-score");
 
-// Update de status van de game
-function update() {
-    if (gameOver) return;
+    const emojiContainer = document.getElementById("emoji-rating");
+    const highScoreText = document.getElementById("high-score");
+    const lastEmojiText = document.getElementById("last-emoji");
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+    let score = 0;
+    let highScore = localStorage.getItem("highScore") || 0;
+    let lastEmoji = localStorage.getItem("lastEmoji") || "😊";
+    let gameTime;
+    let timer;
 
-    snake.move();
-    snake.draw();
+    highScoreText.textContent = `🏆 High Score: ${highScore}`;
+    lastEmojiText.textContent = `Last Emoji: ${lastEmoji}`;
 
-    apple.draw();
-    if (snake.eatApple(apple)) {
-        score++;
-        if (score > highScore) highScore = score;
-        apple = new Apple(); // Maak nieuwe appel
+    // Functie om een scherm te tonen
+    function showScreen(screen) {
+        // Verberg alle schermen
+        welcomeScreen.classList.add("hidden");
+        timeSelectScreen.classList.add("hidden");
+        gameScreen.classList.add("hidden");
+        endScreen.classList.add("hidden");
+
+        // Toon het gewenste scherm
+        screen.classList.remove("hidden");
     }
 
-    document.getElementById('score').textContent = `Score: ${score}`;
-    document.getElementById('highScore').textContent = `Highscore: ${highScore}`;
+    // Start de game en toon het tijdselectiescherm
+    playButton.addEventListener("click", () => {
+        showScreen(timeSelectScreen);
+    });
 
-    if (snake.isDead()) {
-        gameOver = true;
-        alert(`Game Over! Je score was ${score}`);
-    }
-}
-
-// Snake object
-function Snake() {
-    this.body = [{ x: 10, y: 10 }];
-    this.direction = 'RIGHT'; // Start richting
-    this.changeDirection = function (newDirection) {
-        if (newDirection === 'UP' && this.direction !== 'DOWN') this.direction = 'UP';
-        if (newDirection === 'DOWN' && this.direction !== 'UP') this.direction = 'DOWN';
-        if (newDirection === 'LEFT' && this.direction !== 'RIGHT') this.direction = 'LEFT';
-        if (newDirection === 'RIGHT' && this.direction !== 'LEFT') this.direction = 'RIGHT';
-    };
-
-    this.move = function () {
-        let head = { ...this.body[0] };
-        if (this.direction === 'UP') head.y--;
-        if (this.direction === 'DOWN') head.y++;
-        if (this.direction === 'LEFT') head.x--;
-        if (this.direction === 'RIGHT') head.x++;
-
-        this.body.unshift(head);
-        this.body.pop();
-    };
-
-    this.draw = function () {
-        ctx.fillStyle = "green";
-        this.body.forEach(segment => {
-            ctx.fillRect(segment.x * scale, segment.y * scale, scale, scale);
+    // Start een nieuw spel met de geselecteerde tijd
+    startButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            startGame(parseInt(button.dataset.time));
         });
-    };
+    });
 
-    this.eatApple = function (apple) {
-        const head = this.body[0];
-        if (head.x === apple.x && head.y === apple.y) {
-            this.body.push({ x: apple.x, y: apple.y });
-            return true;
-        }
-        return false;
-    };
+    // Start het spel met de gekozen tijd
+    function startGame(time) {
+        score = 0;
+        scoreDisplay.textContent = score;
+        gameTime = time;
+        showScreen(gameScreen);
+        startTimer();
+    }
 
-    this.isDead = function () {
-        const head = this.body[0];
-        if (head.x < 0 || head.x >= columns || head.y < 0 || head.y >= rows) return true;
-        for (let i = 1; i < this.body.length; i++) {
-            if (head.x === this.body[i].x && head.y === this.body[i].y) return true;
-        }
-        return false;
-    };
-}
-
-// Apple object
-function Apple() {
-    this.x = Math.floor(Math.random() * columns);
-    this.y = Math.floor(Math.random() * rows);
-
-    this.draw = function () {
-        ctx.fillStyle = "red";
-        ctx.fillRect(this.x * scale, this.y * scale, scale, scale);
-    };
-}
-
-// Voeg toetsenbord input toe om de richting van de slang te veranderen
-window.addEventListener('keydown', (e) => {
-    if (e.key === "ArrowUp") snake.changeDirection('UP');
-    if (e.key === "ArrowDown") snake.changeDirection('DOWN');
-    if (e.key === "ArrowLeft") snake.changeDirection('LEFT');
-    if (e.key === "ArrowRight") snake.changeDirection('RIGHT');
-});
-
-startGame();
+    // Start de timer
+    function startTimer() {
+        timer = setInterval(() => {
+            gameTime--;
+            timerDisplay.textContent = `⏳ ${gameTime}`;
+            if (gameTime <= 0) {
+                clearInterval(timer);
+                showEndScreen();
+            }
+        }, 1000);
+    }

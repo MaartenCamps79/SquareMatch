@@ -1,20 +1,49 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game</title>
-    <link rel="stylesheet" href="style.css"> <!-- Laad de CSS -->
+    <title>Square Match</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Welkomstscherm -->
+    <div id="welcome-screen">
+        <h1 id="welcome-title">Square Match</h1>
+        <p id="high-score">🏆 High Score: 0</p>
+        <p id="last-emoji">Last Emoji: 😊</p>
+        <button id="play-button">Play</button>
+    </div>
 
-<div class="container">
-    <h1>Snake Game</h1>
-    <canvas id="gameCanvas" width="500" height="500"></canvas>
-    <p id="score">Score: 0</p>
-    <p id="highScore">Highscore: 0</p>
-</div>
+    <!-- Tijd kiezen scherm -->
+    <div id="time-select-screen" class="hidden">
+        <h2>Select Time</h2>
+        <button class="start-game" data-time="30">30 Seconds</button>
+        <button class="start-game" data-time="60">1 Minute</button>
+        <button class="start-game" data-time="120">2 Minutes</button>
+    </div>
 
-<script src="script.js"></script> <!-- Laad de JavaScript -->
+    <!-- Spelscherm -->
+    <div id="game-screen" class="hidden">
+        <h2>Game</h2>
+        <div id="timer">⏳ 0</div>
+        <div id="score">0</div>
+        <div id="grid"></div>
+    </div>
+
+    <!-- Eindscherm -->
+    <div id="end-screen" class="hidden">
+        <h2>Game Over</h2>
+        <div id="final-score"></div>
+        <div id="emoji-rating">
+            <button class="emoji-btn">😊</button>
+            <button class="emoji-btn">😡</button>
+            <button class="emoji-btn">😎</button>
+        </div>
+        <button id="restart">Start New Game</button>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
