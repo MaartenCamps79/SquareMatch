@@ -1,49 +1,108 @@
-<!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Square Match</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>Training App</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <!-- Welkomstscherm -->
-    <div id="welcome-screen">
-        <h1 id="welcome-title">Square Match</h1>
-        <p id="high-score">🏆 High Score: 0</p>
-        <p id="last-emoji">Last Emoji: 😊</p>
-        <button id="play-button">Play</button>
-    </div>
-
-    <!-- Tijd kiezen scherm -->
-    <div id="time-select-screen" class="hidden">
-        <h2>Select Time</h2>
-        <button class="start-game" data-time="30">30 Seconds</button>
-        <button class="start-game" data-time="60">1 Minute</button>
-        <button class="start-game" data-time="120">2 Minutes</button>
-    </div>
-
-    <!-- Spelscherm -->
-    <div id="game-screen" class="hidden">
-        <h2>Game</h2>
-        <div id="timer">⏳ 0</div>
-        <div id="score">0</div>
-        <div id="grid"></div>
-    </div>
-
-    <!-- Eindscherm -->
-    <div id="end-screen" class="hidden">
-        <h2>Game Over</h2>
-        <div id="final-score"></div>
-        <div id="emoji-rating">
-            <button class="emoji-btn">😊</button>
-            <button class="emoji-btn">😡</button>
-            <button class="emoji-btn">😎</button>
+    <div class="welcome-screen" id="welcome-screen">
+        <h1>Welkom bij Crutz 🏋️‍♂️</h1>
+        <p>Trainingsschema 📅 & Voeding 🍽️</p>
+        <div class="buttons">
+            <button class="black-button" onclick="showTraining()">Trainingsschema</button>
+            <button class="black-button" onclick="showVoeding()">Voeding</button>
         </div>
-        <button id="restart">Start New Game</button>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Trainingsschema -->
+    <div class="trainingsschema" id="trainingsschema" style="display:none;">
+        <h2>Trainingsschema 🏋️‍♂️</h2>
+        <p>Dag van de week: <span id="dag-van-de-week"></span></p>
+        <p>Aantal dagen afgerond: <span id="dagen-afgerond">0</span></p>
+        <p>Aantal dagen te gaan: <span id="dagen-te-gaan">144</span></p>
+
+        <div class="oefeningen" id="oefeningen">
+            <!-- Oefeningen voor de eerste dag (Biceps & Borst) -->
+            <div class="oefening" id="oefening-1">
+                <h3>Dumbbell Bench Press (Borst)</h3>
+                <p>Sets: 4 | Reps: 10-12</p>
+                <p><strong>Uitvoering:</strong></p>
+                <ul>
+                    <li>Ga op de halterbank liggen.</li>
+                    <li>Houd in elke hand een dumbbell vast.</li>
+                    <li>Laat de dumbbells zakken tot je ellebogen net onder borsthoogte zijn.</li>
+                    <li>Druk ze omhoog tot je armen gestrekt zijn.</li>
+                </ul>
+                <button class="black-button" onclick="markAsCompleted(1)">Oefening afgerond</button>
+            </div>
+            <div class="oefening" id="oefening-2">
+                <h3>Incline Dumbbell Bench Press (Bovenborst)</h3>
+                <p>Sets: 3 | Reps: 10-12</p>
+                <p><strong>Uitvoering:</strong></p>
+                <ul>
+                    <li>Stel je halterbank in op een schuine hoek (ongeveer 30-45 graden).</li>
+                    <li>Doe dezelfde beweging als bij de reguliere bench press.</li>
+                </ul>
+                <button class="black-button" onclick="markAsCompleted(2)">Oefening afgerond</button>
+            </div>
+            <div class="oefening" id="oefening-3">
+                <h3>Dumbbell Flys (Borst)</h3>
+                <p>Sets: 3 | Reps: 12-15</p>
+                <p><strong>Uitvoering:</strong></p>
+                <ul>
+                    <li>Ga op de halterbank liggen.</li>
+                    <li>Houd in beide handen een dumbbell en strek je armen recht omhoog.</li>
+                    <li>Laat je armen langzaam naar de zijkanten zakken, licht gebogen, tot je een rek voelt in je borst.</li>
+                    <li>Breng de gewichten weer samen boven je borst.</li>
+                </ul>
+                <button class="black-button" onclick="markAsCompleted(3)">Oefening afgerond</button>
+            </div>
+            <div class="oefening" id="oefening-4">
+                <h3>Bicep Curls (Biceps)</h3>
+                <p>Sets: 3 | Reps: 10-12</p>
+                <p><strong>Uitvoering:</strong></p>
+                <ul>
+                    <li>Houd de dumbbells vast met je handpalmen naar boven gericht.</li>
+                    <li>Breng de dumbbells omhoog naar je schouders.</li>
+                    <li>Laat ze langzaam zakken.</li>
+                </ul>
+                <button class="black-button" onclick="markAsCompleted(4)">Oefening afgerond</button>
+            </div>
+            <div class="oefening" id="oefening-5">
+                <h3>Concentration Curls (Biceps)</h3>
+                <p>Sets: 3 per arm | Reps: 10-12</p>
+                <p><strong>Uitvoering:</strong></p>
+                <ul>
+                    <li>Zit op de rand van de halterbank.</li>
+                    <li>Steun je elleboog op de binnenkant van je knie.</li>
+                    <li>Curl de dumbbell omhoog en laat langzaam zakken.</li>
+                </ul>
+                <button class="black-button" onclick="markAsCompleted(5)">Oefening afgerond</button>
+            </div>
+        </div>
+
+        <button class="black-button" onclick="backToWelcome()">Terug naar welkom</button>
+    </div>
+
+    <!-- Voeding -->
+    <div class="voeding" id="voeding" style="display:none;">
+        <h2>Voeding 🍽️</h2>
+        <p>Proteïne per dag: 120g</p>
+        <p>Goed voor proteïne: Kip, vis, eieren, tofu, bonen, noten.</p>
+
+        <div class="water">
+            <!-- Waterdruppel emoji knop -->
+            <button class="round-button" onclick="trackWater()">💧</button>
+            <p>Aantal glazen water vandaag: <span id="water-aantal">0</span></p>
+            <p id="water-status"></p>
+        </div>
+
+        <button class="black-button" onclick="backToWelcome()">Terug naar welkom</button>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
