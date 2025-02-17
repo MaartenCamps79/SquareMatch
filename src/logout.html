@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uitloggen</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="main-container">
+        <header>
+            <h1>Je bent uitgelogd</h1>
+        </header>
+
+        <div class="buttons-container">
+            <a href="login.html" class="button">Inloggen</a>
+        </div>
+    </div>
+
+    <script>
+        localStorage.removeItem('username');
+    </script>
+</body>
+
+</html>
