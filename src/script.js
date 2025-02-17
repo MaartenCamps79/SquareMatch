@@ -1,3 +1,20 @@
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // voorkom het herladen van de pagina bij het verzenden van het formulier
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('errorMessage');
+
+    // Simpele inlogcontrole (vervang dit door je echte backend-logica)
+    if (username === "testuser" && password === "password123") {
+        // Als de inloggegevens correct zijn, sla de gebruikersnaam op in localStorage
+        localStorage.setItem("loggedInUser", username);
+        window.location.href = "dashboard.html"; // Verwijs naar de dashboardpagina
+    } else {
+        errorMessage.textContent = "Ongeldige gebruikersnaam of wachtwoord!";
+    }
+});
+
 // Variables to track exercises and days
 let waterAantal = 0;
 let dagenAfgerond = 0;
