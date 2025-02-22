@@ -1,3 +1,18 @@
+// Voeg koolhydraten toe aan de lijst en werk het totaal bij
+function addCarbs(amount) {
+    let listItem = document.createElement("li");
+    listItem.textContent = `${amount}g`;
+    document.getElementById("carb-list").appendChild(listItem);
+
+    let totalCarbs = document.getElementById("total-carbs");
+    let currentTotal = parseInt(totalCarbs.textContent) + amount;
+    totalCarbs.textContent = currentTotal;
+
+    // Bewaren van het totaal aantal koolhydraten in localStorage
+    localStorage.setItem("totalCarbs", currentTotal);
+}
+
+// Event listener voor de chat
 document.getElementById("send-btn").addEventListener("click", async function() {
     let userInput = document.getElementById("user-input").value;
     if (!userInput) return;
@@ -9,6 +24,7 @@ document.getElementById("send-btn").addEventListener("click", async function() {
     let botReply = await askAI(userInput);
     chatBox.innerHTML += `<p><strong>AI:</strong> ${botReply}</p>`;
 
+    // Als de bot een antwoord geeft met "Wil je dit toevoegen?", vragen we om bevestiging
     if (botReply.includes("Wil je dit toevoegen?")) {
         let carbAmount = parseInt(userInput.match(/\d+/)); // Haalt getal uit de input
         if (!isNaN(carbAmount)) {
@@ -18,24 +34,6 @@ document.getElementById("send-btn").addEventListener("click", async function() {
 
     chatBox.scrollTop = chatBox.scrollHeight;
 });
-
-// Koolhydraten toevoegen + totaal bijwerken
-document.getElementById("add-carb-btn").addEventListener("click", function() {
-    let carbAmount = prompt("Voer het aantal koolhydraten in:");
-    let amount = parseInt(carbAmount);
-    if (!isNaN(amount)) {
-        addCarbs(amount);
-    }
-});
-
-function addCarbs(amount) {
-    let listItem = document.createElement("li");
-    listItem.textContent = `${amount}g`;
-    document.getElementById("carb-list").appendChild(listItem);
-
-    let totalCarbs = document.getElementById("total-carbs");
-    totalCarbs.textContent = parseInt(totalCarbs.textContent) + amount;
-}
 
 // Water toevoegen
 document.getElementById("add-water-btn").addEventListener("click", function() {
@@ -50,4 +48,3 @@ document.getElementById("add-water-btn").addEventListener("click", function() {
         motivationText.textContent = "";
     }
 });
-
