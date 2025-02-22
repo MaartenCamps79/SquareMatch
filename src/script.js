@@ -1,62 +1,35 @@
-// Variables to track exercises and days
-let waterAantal = 0;
-let dagenAfgerond = 0;
-let oefeningenAfgerond = 0; // To track completed exercises
+document.getElementById("send-btn").addEventListener("click", async function() {
+    let userInput = document.getElementById("user-input").value;
+    if (!userInput) return;
 
-// Function to track water intake
-function trackWater() {
-    waterAantal++;
-    document.getElementById('water-aantal').innerText = waterAantal;
+    let chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML += `<p><strong>Jij:</strong> ${userInput}</p>`;
+    document.getElementById("user-input").value = "";
 
-    let waterStatus = '';
-    if (waterAantal <= 3) {
-        waterStatus = 'Drink meer water!';
-    } else if (waterAantal <= 6) {
-        waterStatus = 'Lekker bezig!';
-    } else {
-        waterStatus = 'Goed bezig, maar kijk uit dat je niet te veel drinkt!';
+    let botReply = await askAI(userInput);
+    chatBox.innerHTML += `<p><strong>AI:</strong> ${botReply}</p>`;
+
+    if (botReply.includes("Wil je dit toevoegen?")) {
+        let listItem = document.createElement("li");
+        listItem.textContent = userInput;
+        document.getElementById("carb-list").appendChild(listItem);
     }
-    document.getElementById('water-status').innerText = waterStatus;
-}
 
-// Function to show the training section
-function showTraining() {
-    document.getElementById('trainingsschema').style.display = 'block';
-    document.getElementById('welcome-screen').style.display = 'none';
-    document.getElementById('dag-van-de-week').innerText = getDayOfWeek();
-}
+    chatBox.scrollTop = chatBox.scrollHeight;
+});
 
-// Function to show the nutrition section
-function showVoeding() {
-    document.getElementById('voeding').style.display = 'block';
-    document.getElementById('welcome-screen').style.display = 'none';
-}
-
-// Function to go back to the welcome screen
-function backToWelcome() {
-    document.getElementById('trainingsschema').style.display = 'none';
-    document.getElementById('voeding').style.display = 'none';
-    document.getElementById('welcome-screen').style.display = 'block';
-}
-
-// Function to get the current day of the week
-function getDayOfWeek() {
-    const days = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
-    const today = new Date();
-    return days[today.getDay()];
-}
-
-// Function to mark an exercise as completed
-function markAsCompleted(oefeningNummer) {
-    // Mark the exercise as completed
-    const oefening = document.getElementById('oefening-' + oefeningNummer);
-    oefening.querySelector('button').innerText = 'Afgerond';
-    oefening.querySelector('button').disabled = true; // Disable the button once it's clicked
-    oefeningenAfgerond++;
-
-    // If all 5 exercises are completed, increase the number of completed days
-    if (oefeningenAfgerond === 5) {
-        dagenAfgerond++;
-        document.getElementById('dagen-afgerond').innerText = dagenAfgerond;
+// Koolhydraten toevoegen
+document.getElementById("add-carb-btn").addEventListener("click", function() {
+    let carbAmount = prompt("Voer het aantal koolhydraten in:");
+    if (carbAmount) {
+        let listItem = document.createElement("li");
+        listItem.textContent = `${carbAmount}g`;
+        document.getElementById("carb-list").appendChild(listItem);
     }
-}
+});
+
+// Water toevoegen
+document.getElementById("add-water-btn").addEventListener("click", function() {
+    let waterCount = document.getElementById("water-count");
+    waterCount.textContent = parseInt(waterCount.textContent) + 1;
+});
