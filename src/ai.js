@@ -18,6 +18,6 @@ async function askAI(question) {
         return data.choices[0].message.content;
     } catch (error) {
         console.error("Error:", error);
-        return "Sorry, er is een probleem met de AI.";
+        return "godverdomme ik werk weer niet misschien werk ik later weer.";
     }
 }
